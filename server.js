@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
   socket.emit('updateData', tasks);
 
   socket.on('addTask', (task) => {
-    task.push(task);
+    tasks.push(task);
     socket.broadcast.emit('addTask', task);
     console.log('Succesfully added task!');
   });
@@ -36,6 +36,6 @@ io.on('connection', (socket) => {
     const index = tasks.findIndex(item => item.id === taskId);
     tasks.splice(index, 1);
     console.log('Task removed!');
-    socket.broadcast.emit('removeTask', taskId);
+    socket.broadcast.emit('updateData', tasks);
   });
 });

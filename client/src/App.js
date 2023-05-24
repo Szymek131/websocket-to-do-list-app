@@ -6,9 +6,11 @@ const App = () => {
 
   const [tasks, setTasks] = useState([]);
   const [taskName, setTaskName] = useState('');
-  const socket = io('localhost:8000');
+  const [socket, setSocket] = useState();
 
   useEffect(() => {
+    const socket = io('localhost:8000');
+    setSocket(socket);
     socket.on('addTask', tasks => addTask(tasks));
     socket.on('removeTask', taskId => removeTask(taskId));
     socket.on('updateData', tasksList => updateTasks(tasksList));
@@ -23,14 +25,19 @@ const App = () => {
 
   const removeTask = id => {
     setTasks(tasks => tasks.filter(task => task.id !== id));
-    socket.broadcast.emit('removeTask', id);
+    socket.emit('removeTask', id);
   }
 
   const submitForm = e => {
     e.preventDefault();
-    const taskData = { name: taskName, id: shortid.generate() }
-    addTask(taskData);
-    socket.emit('addTask', taskData);
+    if (taskName.length >= 1) {
+      const taskData = { name: taskName, id: shortid.generate() }
+      addTask(taskData);
+      socket.emit('addTask', taskData);
+      setTaskName('');
+    } else {
+      window.alert('Task must be 1 character or longer !')
+    }
   }
 
   const addTask = task => {
